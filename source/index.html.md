@@ -1,15 +1,9 @@
 ---
-title: API Reference
+title: AdWise Rest API
 
 language_tabs:
-  - shell
   - ruby
-  - python
-  - javascript
-
-toc_footers:
-  - <a href='#'>Sign Up for a Developer Key</a>
-  - <a href='https://github.com/tripit/slate'>Documentation Powered by Slate</a>
+  - http
 
 includes:
   - errors
@@ -17,173 +11,177 @@ includes:
 search: true
 ---
 
-# Introduction
+# Введение
 
-Welcome to the Kittn API! You can use our API to access Kittn API endpoints, which can get information on various cats, kittens, and breeds in our database.
+В данном документе приведена схема REST-API для проекта AdWise.
 
-We have language bindings in Shell, Ruby, and Python! You can view code examples in the dark area to the right, and you can switch the programming language of the examples with the tabs in the top right.
+API endpoints, параметры и ожидаемые ответы.
 
-This example API documentation page was created with [Slate](https://github.com/tripit/slate). Feel free to edit it and use it as a base for your own API's documentation.
+Имеются примеры кода для взаимодействия с API.
 
-# Authentication
+# Регистрация
 
-> To authorize, use this code:
+## Регистрация через email
 
-```ruby
-require 'kittn'
+### HTTP Запрос
+`POST /api/profile`
 
-api = Kittn::APIClient.authorize!('meowmeowmeow')
-```
+### Параметры запроса
 
-```python
-import kittn
+Параметр  | Описание
+--------- | -------
+email     | email
+password  | пароль
 
-api = kittn.authorize('meowmeowmeow')
-```
+## Регистрация через OAuth
 
-```shell
-# With shell, you can just pass the correct header with each request
-curl "api_endpoint_here"
-  -H "Authorization: meowmeowmeow"
-```
+### HTTP Запрос
 
-```javascript
-const kittn = require('kittn');
+`GET /api/oauth/callback`
 
-let api = kittn.authorize('meowmeowmeow');
-```
+### Параметры запроса
 
-> Make sure to replace `meowmeowmeow` with your API key.
+Параметр          | Описание
+----------------- | -------
+code              | код OAuth
+error             | ошибка
+error_resaon      | причина ошибки
+error_description | описание ошибки
 
-Kittn uses API keys to allow access to the API. You can register a new Kittn API key at our [developer portal](http://example.com/developers).
+# Сессии
 
-Kittn expects for the API key to be included in all API requests to the server in a header that looks like the following:
+## Вход в аккаунт (OAuth)
+Вход через OAuth производится аналогично авторизации
 
-`Authorization: meowmeowmeow`
+## Вход в аккаунт (Email)
+### HTTP Запрос
+`POST /api/session`
 
-<aside class="notice">
-You must replace <code>meowmeowmeow</code> with your personal API key.
-</aside>
+### Параметры запроса
 
-# Kittens
+Параметр  | Описание
+--------- | -------
+email     | email
+password  | пароль
 
-## Get All Kittens
+## Выход из аккаунта
+### HTTP Запрос
+`DELETE /api/session`
 
-```ruby
-require 'kittn'
 
-api = Kittn::APIClient.authorize!('meowmeowmeow')
-api.kittens.get
-```
+# Профиль
 
-```python
-import kittn
+## Получение информации
+### HTTP Запрос
+`GET /api/profile/me`
 
-api = kittn.authorize('meowmeowmeow')
-api.kittens.get()
-```
+## Обновление информации
+### HTTP Запрос
+`PATCH /api/profile/me`
 
-```shell
-curl "http://example.com/api/kittens"
-  -H "Authorization: meowmeowmeow"
-```
+## Получение информации о другом пользователе
+### HTTP Запрос
+`GET /api/profile/:user_id`
 
-```javascript
-const kittn = require('kittn');
+# Календарь
+## Просмотр календаря
+### HTTP Запрос
+`GET /api/calendar`
 
-let api = kittn.authorize('meowmeowmeow');
-let kittens = api.kittens.get();
-```
+## Добавить запись
+### HTTP Запрос
+`POST /api/calendar`
 
-> The above command returns JSON structured like this:
+## Редактировать запись
+### HTTP Запрос
+`PATCH /api/calendar/:id`
 
-```json
-[
-  {
-    "id": 1,
-    "name": "Fluffums",
-    "breed": "calico",
-    "fluffiness": 6,
-    "cuteness": 7
-  },
-  {
-    "id": 2,
-    "name": "Max",
-    "breed": "unknown",
-    "fluffiness": 5,
-    "cuteness": 10
-  }
-]
-```
+## Удалить запись
+### HTTP Запрос
+`DELETE /api/calendar/:id`
 
-This endpoint retrieves all kittens.
+# База рекламодателей
+### HTTP Запрос
+`GET /api/advertisers`
+В параметрах передаются требуемые фильтры
 
-### HTTP Request
+# База блогеров
+### HTTP Запрос
+`GET /api/influencers`
+В параметрах передаются требуемые фильтры
 
-`GET http://example.com/api/kittens`
+# Рекламные кампании
+## Поиск
+### HTTP запрос
+`GET /api/ad_campaigns`
+В параметрах передаются требуемые фильтры
 
-### Query Parameters
+## Просмотр информации
+### HTTP запрос
+`GET /api/ad_campaigns/:id`
 
-Parameter | Default | Description
---------- | ------- | -----------
-include_cats | false | If set to true, the result will also include cats.
-available | true | If set to false, the result will include kittens that have already been adopted.
+## Создание
+### HTTP запрос
+`POST /api/ad_campaigns`
 
-<aside class="success">
-Remember — a happy kitten is an authenticated kitten!
-</aside>
+## Редактирование
+### HTTP запрос
+`PATCH /api/ad_campaigns/:id`
 
-## Get a Specific Kitten
+## Удаление
+### HTTP запрос
+`DELETE /api/ad_campaigns/:id`
 
-```ruby
-require 'kittn'
+# Отклики
+## Список откликов
+### HTTP запрос
+`GET /api/ad_campaigns/:id/offers`
 
-api = Kittn::APIClient.authorize!('meowmeowmeow')
-api.kittens.get(2)
-```
+## Откликнуться (для блогера)
+### HTTP запрос
+`POST /api/ad_campaigns/:id/offer`
 
-```python
-import kittn
+## Отозвать отклик (для блогера)
+### HTTP запрос
+`DELETE /api/ad_campaigns/:id/offer`
 
-api = kittn.authorize('meowmeowmeow')
-api.kittens.get(2)
-```
+## Принять предложение (для блогера)
+### HTTP запрос
+`PATCH /api/ad_campaigns/:id/offer`
 
-```shell
-curl "http://example.com/api/kittens/2"
-  -H "Authorization: meowmeowmeow"
-```
+## Создать предложение (для рекламодателя)
+### HTTP запрос
+`POST /api/ad_campaigns/:id/offers`
 
-```javascript
-const kittn = require('kittn');
+## Отозвать предложение (для рекламодателя)
+### HTTP запрос
+`DELETE /api/ad_campaigns/:id/offers/:id`
 
-let api = kittn.authorize('meowmeowmeow');
-let max = api.kittens.get(2);
-```
+## Выбрать блогера (для рекламодателя)
+### HTTP запрос
+`PATCH /api/ad_campaigns/:id/offers`
 
-> The above command returns JSON structured like this:
+# Отклики (после подтвержения)
 
-```json
-{
-  "id": 2,
-  "name": "Max",
-  "breed": "unknown",
-  "fluffiness": 5,
-  "cuteness": 10
-}
-```
+## Просмотр предложений
+### HTTP запрос
+`GET /api/offers`
+В параметрах передаются требуемые фильтры
 
-This endpoint retrieves a specific kitten.
+## Просмотр информации о предложении
+### HTTP запрос
+`GET /api/offers/:id`
 
-<aside class="warning">Inside HTML code blocks like this one, you can't use Markdown, so use <code>&lt;code&gt;</code> blocks to denote code.</aside>
+## Жизненый цикл преложения
+### HTTP запрос
+`PATCH /api/offers/:id`
 
-### HTTP Request
+## Удаление предложения
+### HTTP запрос
+`DELETE /api/offers/:id`
 
-`GET http://example.com/kittens/<ID>`
-
-### URL Parameters
-
-Parameter | Description
---------- | -----------
-ID | The ID of the kitten to retrieve
+# Загрузка файлов
+### HTTP запрос
+`POST /api/uploads`
+Универсальный endpoint для загрузки контента
 
